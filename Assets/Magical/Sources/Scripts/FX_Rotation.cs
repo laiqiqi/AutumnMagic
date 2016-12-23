@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
-
+using DG.Tweening;
 namespace MagicalFX
 {
 	public class FX_Rotation : MonoBehaviour
@@ -10,12 +10,12 @@ namespace MagicalFX
 
 		void Start ()
 		{
-	
 		}
 	
 		void FixedUpdate ()
 		{
 			this.transform.Rotate (Speed);
 		}
+        
 	}
 }
