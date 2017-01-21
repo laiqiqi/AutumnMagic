@@ -193,11 +193,25 @@ public class GameManager : MonoBehaviour {
         Destroy(Qustions);
         for (int i = 0; i < PuzzlePositons.Length; i++)
         {
-            PuzzlePositons[i].gameObject.AddComponent<Rigidbody>().useGravity = true;
+            if (PuzzlePositons[i].GetComponent<Rigidbody>() != null)
+            {
+                PuzzlePositons[i].GetComponent<Rigidbody>().useGravity = true;
+            }
+            else
+            {
+                PuzzlePositons[i].gameObject.AddComponent<Rigidbody>().useGravity = true;
+            }
         }
         for (int i = 0; i < Wakus.Length; i++)
         {
-            Wakus[i].AddComponent<Rigidbody>().useGravity = true;
+            if (Wakus[i].GetComponent<Rigidbody>() != null)
+            {
+                Wakus[i].GetComponent<Rigidbody>().useGravity = true;
+            }
+            else
+            {
+                Wakus[i].AddComponent<Rigidbody>().useGravity = true;
+            }
         }
         Audio.PlayOneShot(SE_Clips[3]);
         GameOverText.SetActive(true);

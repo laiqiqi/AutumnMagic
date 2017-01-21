@@ -35,18 +35,18 @@ public class ClearStage : MonoBehaviour {
             if (i == ImagePrefabs.Length-1)
             {
                 GameObject title = null;
-                if (GameInfo.Instance.Minute <= 5)
+                if (GameInfo.Instance.Minute <= 4)
                 {
                     title = Instantiate(TitlePrefabs[0]);
-                }else if (GameInfo.Instance.Minute <= 8)
+                }else if (GameInfo.Instance.Minute <= 6)
                 {
                     title = Instantiate(TitlePrefabs[1]);
                 }
-                else if (GameInfo.Instance.Minute <= 10)
+                else if (GameInfo.Instance.Minute <= 8)
                 {
                     title = Instantiate(TitlePrefabs[2]);
                 }
-                else if (GameInfo.Instance.Minute <= 15)
+                else if (GameInfo.Instance.Minute <= 10)
                 {
                     title = Instantiate(TitlePrefabs[3]);
                 }

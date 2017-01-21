@@ -43,24 +43,40 @@ public class HitCheck : MonoBehaviour {
                 other.GetComponent<Rigidbody>().velocity = Vector3.zero;
                 Destroy(other.GetComponent<Rigidbody>());
                 other.gameObject.SetActive(false);
-                StartCoroutine(ResetPeace(other.gameObject));
+                //StartCoroutine(ResetPeace(other.gameObject));
+                gm.CreateHitEffect(1, gm.InitPos[other.GetComponent<Peace>().Index].position);
+                other.transform.position = gm.InitPos[other.GetComponent<Peace>().Index].position;
+                other.transform.rotation = gm.InitPos[other.GetComponent<Peace>().Index].rotation;
+
+                if(other.GetComponent<Rigidbody>()!=null)
+                {
+                    other.GetComponent<Rigidbody>().Sleep();
+                }
+                else
+                {
+                    other.gameObject.AddComponent<Rigidbody>().Sleep();
+                }
+
+                other.gameObject.SetActive(true);   
+                gm.Audio.PlayOneShot(gm.SE_Clips[4]);
                 gm.Penalty();
+
             }
         }
     }
 
-    IEnumerator ResetPeace(GameObject go)
-    {
-        yield return new WaitForSeconds(1.0f);
-        gm.CreateHitEffect(1, gm.InitPos[go.GetComponent<Peace>().Index].position);
-        yield return new WaitForSeconds(0.5f);
-        go.transform.position = gm.InitPos[go.GetComponent<Peace>().Index].position;
-        go.transform.rotation = gm.InitPos[go.GetComponent<Peace>().Index].rotation;   
-        go.SetActive(true);
-        go.AddComponent<Rigidbody>().Sleep();
-        gm.Audio.PlayOneShot(gm.SE_Clips[4]);
-        
-    }
+    //IEnumerator ResetPeace(GameObject go)
+    //{
+    //    yield return new WaitForSeconds(1.0f);
+    //    gm.CreateHitEffect(1, gm.InitPos[go.GetComponent<Peace>().Index].position);
+    //    yield return new WaitForSeconds(0.5f);
+    //    go.transform.position = gm.InitPos[go.GetComponent<Peace>().Index].position;
+    //    go.transform.rotation = gm.InitPos[go.GetComponent<Peace>().Index].rotation;   
+    //    go.SetActive(true);
+    //    go.AddComponent<Rigidbody>().Sleep();
+    //    gm.Audio.PlayOneShot(gm.SE_Clips[4]);
+
+    //}
 
     private void MyCallback(Collider other)
     {
