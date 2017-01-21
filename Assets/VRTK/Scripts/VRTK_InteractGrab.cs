@@ -498,7 +498,7 @@ namespace VRTK
             if (objectToGrab != null)
             {
                 controllerActions.TriggerHapticPulse(3999);
-                GameManager.Instance.Audio.PlayOneShot(GameManager.Instance.Clips[7]);
+                GameManager.Instance.Audio.PlayOneShot(GameManager.Instance.SE_Clips[7]);
                 IncrementGrabState();
                 var initialGrabAttempt = false;
 
@@ -541,7 +541,7 @@ namespace VRTK
         {
             if (CanRelease() && (IsObjectHoldOnGrab(grabbedObject) || grabEnabledState >= 2))
             {
-                GameManager.Instance.Audio.PlayOneShot(GameManager.Instance.Clips[6]);
+                GameManager.Instance.Audio.PlayOneShot(GameManager.Instance.SE_Clips[6]);
                 if (grabbedObject.GetComponent<VRTK_InteractableObject>().AttachIsUnthrowableObject())
                 {
                     UngrabTrackedObject();

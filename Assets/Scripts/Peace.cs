@@ -11,7 +11,11 @@ public class Peace : MonoBehaviour
     {
         if (collision.gameObject.tag == "Terrain")
         {
-            GameManager.Instance.Audio.PlayOneShot(GameManager.Instance.Clips[8]);
+            if (GameManager.Instance.StageNumber != 0)
+            {
+                GameInfo.Instance.HP -= 1;
+            }
+            GameManager.Instance.Audio.PlayOneShot(GameManager.Instance.SE_Clips[8]);
             GameManager.Instance.CreateHitEffect(2, transform.position);
             GetComponent<Rigidbody>().velocity = Vector3.zero;
             Destroy(GetComponent<Rigidbody>());

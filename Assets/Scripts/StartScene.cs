@@ -11,6 +11,7 @@ public class StartScene : MonoBehaviour {
 	void Start () {
         controllerEvents = GetComponent<VRTK_ControllerEvents>();
         controllerEvents.TriggerClicked += ControllerEvents_TriggerClicked;
+        GameInfo.Instance.HP = 20;
     }
 
     private void ControllerEvents_TriggerClicked(object sender, ControllerInteractionEventArgs e)

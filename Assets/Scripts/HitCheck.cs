@@ -27,20 +27,23 @@ public class HitCheck : MonoBehaviour {
                 //other.transform.SetParent(gm.PeacePositions[Index]);
                 //other.transform.localRotation = Quaternion.Euler(Vector3.zero);
                 //other.transform.DOLocalMove(Vector3.zero, 3.0f);
-                gm.Audio.PlayOneShot(gm.Clips[9]);
+                gm.Audio.PlayOneShot(gm.SE_Clips[9]);
                 other.transform.DOPath(WayPoints, 3.0f).OnComplete(() => MyCallback(other)); 
-                Debug.Log("正解");
+                if (this.transform.parent.name == "Qustion")
+                    Destroy(this.transform.parent.gameObject);
+                else
+                    Destroy(this.gameObject);
+
                 gm.QuestionCount--;
             }
             else
             {
-                gm.Audio.PlayOneShot(gm.Clips[5]);
+                gm.Audio.PlayOneShot(gm.SE_Clips[5]);
                 gm.CreateHitEffect(0, other.transform.position);
                 other.GetComponent<Rigidbody>().velocity = Vector3.zero;
                 Destroy(other.GetComponent<Rigidbody>());
                 other.gameObject.SetActive(false);
                 StartCoroutine(ResetPeace(other.gameObject));
-                Debug.Log("xx");
                 gm.Penalty();
             }
         }
@@ -55,7 +58,7 @@ public class HitCheck : MonoBehaviour {
         go.transform.rotation = gm.InitPos[go.GetComponent<Peace>().Index].rotation;   
         go.SetActive(true);
         go.AddComponent<Rigidbody>().Sleep();
-        gm.Audio.PlayOneShot(gm.Clips[4]);
+        gm.Audio.PlayOneShot(gm.SE_Clips[4]);
         
     }
 
@@ -66,7 +69,7 @@ public class HitCheck : MonoBehaviour {
         other.transform.DOLocalMove(Vector3.zero, 3.0f).OnComplete(()=> {
             other.transform.GetChild(0).gameObject.SetActive(false);
             other.transform.GetChild(1).gameObject.SetActive(false);
-            gm.Audio.PlayOneShot(gm.Clips[1]);
+            gm.Audio.PlayOneShot(gm.SE_Clips[1]);
         });
         other.transform.DOScale(1.0f, 2.0f);
     }

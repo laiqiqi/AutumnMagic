@@ -4,12 +4,14 @@ using System.Collections.Generic;
 using VRTK;
 using DG.Tweening;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
+
 public class GameManager : MonoBehaviour {
 
     public static GameManager Instance;
 
     public Transform[] PuzzlePositons;
-    public GameObject[] PuzzlePrefabs;
+    public GameObject PuzzlePrefab;
     public Material[] PuzzleMaterials;
     public Transform[] InitPos;
     public GameObject[] Explode;
@@ -30,16 +32,19 @@ public class GameManager : MonoBehaviour {
 
     public AudioSource Audio;
 
-    public AudioClip[] Clips;
+    public AudioClip[] SE_Clips;
+    public AudioClip[] BGM_Clips;
 
-    //public float power = 20;
+    public GameObject Qustions;
+    public GameObject[] Wakus;
 
-    //public Transform cameraRigPos;
+    public Text HPText;
+    public Text TimeText;
+    public GameObject GameOverText;
+    public GameObject GameClearText;
 
-    //public bool isGameStart = false;
-    //public int Count = 0;
 
-    //public GameObject Sphere;
+
 
     void Awake()
     {
@@ -48,99 +53,65 @@ public class GameManager : MonoBehaviour {
     // Use this for initialization
     void Start ()
     {
-        //for (int i = 0; i < PuzzlePrefabs.Length; i++)
-        //{
-        //    GameObject go = Instantiate(PuzzlePrefabs[i]);
-        //    go.transform.SetParent(PuzzlePositons[i]);
-        //    go.transform.localPosition = Vector3.zero;
-        //    go.transform.localRotation = Quaternion.identity;
-        //    go.transform.localScale = Vector3.one;
-
-        //    //go.transform.GetChild(0).gameObject.SetActive(false);
-        //    //go.AddComponent<Puzzle>().PuzzleNumber = i;
-        //    Puzzles.Add(go);
-        //}
-        //Count = 0;
-        //Sphere.SetActive(false);
+        GameOverText.SetActive(false);
+        GameClearText.SetActive(false);
         InitPuzzle(QuestionCount);
     }
 
 
     void Update()
     {
-        //if (StageNumber > 0)
-        //{
-        //    Timer -= Time.deltaTime;
-        //    if (Timer > 30.0f)
-        //    {
-        //        light01.spotAngle -= Time.deltaTime;
-        //    }
-        //    else
-        //    {
-        //        light01.spotAngle -= Time.deltaTime * 2;
-        //    }
-        //    if (Timer <= 0)
-        //    {
-        //        light01.enabled = false;
-        //        light02.enabled = false;
-        //        Audio.PlayOneShot(Clips[3]);
-        //        SceneManager.LoadSceneAsync(0);
-        //    }
-        //}
+        if(GameInfo.Instance.isGameOver|| GameInfo.Instance.Minute >= 60)
+        {
+            GameInfo.Instance.isGameOver = false;
+            StartCoroutine(GameOver());
+        }
+        if (StageNumber != 0)
+        {
+            GameInfo.Instance.isTimeCount = true;
+        }
+        else
+        {
+            GameInfo.Instance.isTimeCount = false;
+        }
 
-        //Debug.Log(Timer);
+        TimeText.text = GameInfo.Instance.Minute + "：" + (int)GameInfo.Instance.Second;
 
-        //if(StageNumber == 0 && Timer > 0)
-        //{
-        //    StartCoroutine(StageClear());
-        //}
+        if (StageNumber != 0)
+        {
+            if (GameInfo.Instance.HP < 0)
+            {
+                HPText.text = "0";
+            }
+            else
+            {
+                HPText.text = GameInfo.Instance.HP.ToString();
+            }        
+        }
+        else
+        {
+            HPText.text = "∞";
+        }
+
+        if (GameInfo.Instance.HP <= 5 && Audio.clip != BGM_Clips[1])
+        {    
+            Audio.clip = BGM_Clips[1];
+            Audio.Play();
+        }
+
         if (QuestionCount == 0)
         {
             QuestionCount = 1;
             StartCoroutine(StageClear(StageNumber));
         }
-        //if (cameraRigPos.position.z > 110.0f &&!isGameStart)
-        //{
-        //    OnGameStart();
-        //    isGameStart = true;
-        //}
 
-        //if (Count >= 16 && Sphere != null)
-        //{
-        //    Sphere.SetActive(true);
-        //}
     }
-    //private void OnGameStart()
-    //{
-    //    for (int i = 0; i < Puzzles.Count; i++)
-    //    {
-    //        Puzzles[i].transform.SetParent(null);
-    //        Puzzles[i].GetComponent<Rigidbody>().AddForce(new Vector3(Random.Range(1, 2), Random.Range(100, 200), Random.Range(1, 2)) * 20);
-            
-    //    }
-    //    for (int i = 0; i < PuzzlePositons.Length; i++)
-    //    {
-    //        PuzzlePositons[i].gameObject.AddComponent<PositionCheck>().PosNumber = i;
-    //    }
-    //}
-
-
-    //public void StageClear()
-    //{
-    //    for (int i = 0; i < PuzzlePositons.Length; i++)
-    //    {
-    //        Destroy(PuzzlePositons[i].gameObject);
-    //    }
-    //    CorrectAnswer.SetActive(true);
-    //    CorrectAnswer.transform.DOMoveY(6.0f, 7.0f);
-    //    CorrectAnswer.transform.DORotate(new Vector3(110.0f, 180.0f, 0.0f), 10.0f).SetDelay(7.0f);
-    //}
 
     private void InitPuzzle(int count)
     {
-        for (int i = 0; i < PuzzlePrefabs.Length; i++)
+        for (int i = 0; i < PuzzlePositons.Length; i++)
         {
-            GameObject go = Instantiate(PuzzlePrefabs[i]);
+            GameObject go = Instantiate(PuzzlePrefab);
             go.GetComponent<MeshRenderer>().material = PuzzleMaterials[i];
             go.transform.SetParent(PuzzlePositons[i]);
             go.transform.localPosition = Vector3.zero;
@@ -148,7 +119,7 @@ public class GameManager : MonoBehaviour {
             go.transform.localScale = Vector3.one;
             Puzzles.Add(go);
         }
-        if (Puzzles.Count == PuzzlePrefabs.Length)
+        if (Puzzles.Count == PuzzlePositons.Length)
         {
             for (int i = 0; i < count; i++)
             {
@@ -194,15 +165,47 @@ public class GameManager : MonoBehaviour {
     public void Penalty()
     {
         CameraRig.DOShakePosition(1.0f);
-        Audio.PlayOneShot(Clips[0]);
+        Audio.PlayOneShot(SE_Clips[0]);
+        if (GameManager.Instance.StageNumber != 1)
+        {
+            GameInfo.Instance.HP -= 1;
+        }
     }
     IEnumerator StageClear(int StageNumber)
     {
         yield return new WaitForSeconds(8.0f);
-        Audio.PlayOneShot(Clips[2]);
-        yield return new WaitForSeconds(2.0f);
+        Audio.PlayOneShot(SE_Clips[2]);
+        if (StageNumber != 0)
+        {
+            GameClearText.SetActive(true);
+            GameClearText.transform.DOScale(0.5f, 0.3f);
+        }
+        yield return new WaitForSeconds(1.0f);
         CameraFade.Fade(Color.white, 2.0f);
-        SceneManager.LoadSceneAsync(StageNumber+1);
+        yield return new WaitForSeconds(3.0f);
+        if (StageNumber != 0)
+            GameInfo.Instance.HP += 10;
+        SceneManager.LoadSceneAsync(StageNumber+2);
+    }
+
+    IEnumerator GameOver()
+    {
+        Destroy(Qustions);
+        for (int i = 0; i < PuzzlePositons.Length; i++)
+        {
+            PuzzlePositons[i].gameObject.AddComponent<Rigidbody>().useGravity = true;
+        }
+        for (int i = 0; i < Wakus.Length; i++)
+        {
+            Wakus[i].AddComponent<Rigidbody>().useGravity = true;
+        }
+        Audio.PlayOneShot(SE_Clips[3]);
+        GameOverText.SetActive(true);
+        GameOverText.transform.DOScale(0.5f, 0.3f);
+        yield return new WaitForSeconds(8.0f);
+        CameraFade.Fade(Color.black, 2.0f);
+        yield return new WaitForSeconds(2.0f);
+        SceneManager.LoadSceneAsync(0);
     }
 
 }
