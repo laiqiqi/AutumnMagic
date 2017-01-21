@@ -9,6 +9,7 @@ public class ClearStage : MonoBehaviour {
     public GameObject[] TitlePrefabs;
     public Transform TitlePos;
     public Transform InitPos;
+    //public GameObject[] Stars;
 
 	// Use this for initialization
 	void Start () {
@@ -62,6 +63,10 @@ public class ClearStage : MonoBehaviour {
                 });
             }
         }
+        //for (int i = 0; i < Stars.Length; i++)
+        //{
+        //    Stars[i].SetActive(true);
+        //}
         TimeText.transform.parent.gameObject.SetActive(true);
     }
 }
