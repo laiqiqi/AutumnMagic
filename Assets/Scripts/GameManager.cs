@@ -1,10 +1,11 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
-using VRTK;
 using DG.Tweening;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using VRTK;
+using VRTK.GrabAttachMechanics;
 
 public class GameManager : MonoBehaviour {
 
@@ -147,7 +148,7 @@ public class GameManager : MonoBehaviour {
                 }
                 Puzzles[index].AddComponent<Rigidbody>().Sleep();
                 Puzzles[index].AddComponent<VRTK_InteractableObject>().isGrabbable = true;
-                Puzzles[index].GetComponent<VRTK_InteractableObject>().throwMultiplier = 4;
+                Puzzles[index].AddComponent<VRTK_FixedJointGrabAttach>().throwMultiplier = 4;
                 Puzzles[index].tag = "Peace";
                 Puzzles[index].AddComponent<Peace>().Index = i;
                 Puzzles.RemoveAt(index);
