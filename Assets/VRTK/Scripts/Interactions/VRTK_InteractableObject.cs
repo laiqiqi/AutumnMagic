@@ -318,6 +318,7 @@ namespace VRTK
                 SecondaryControllerGrab(currentGrabbingObject);
             }
             OnInteractableObjectGrabbed(SetInteractableObjectEvent(currentGrabbingObject));
+            GameManager.Instance.Audio.PlayOneShot(GameManager.Instance.SE_Clips[7]);
         }
 
         /// <summary>
@@ -337,6 +338,7 @@ namespace VRTK
                 SecondaryControllerUngrab(previousGrabbingObject);
             }
             OnInteractableObjectUngrabbed(SetInteractableObjectEvent(previousGrabbingObject));
+            GameManager.Instance.Audio.PlayOneShot(GameManager.Instance.SE_Clips[6]);
         }
 
         /// <summary>

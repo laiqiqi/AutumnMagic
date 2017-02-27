@@ -176,11 +176,8 @@ public class GameManager : MonoBehaviour {
     {
         yield return new WaitForSeconds(8.0f);
         Audio.PlayOneShot(SE_Clips[2]);
-        if (StageNumber != 0)
-        {
-            GameClearText.SetActive(true);
-            GameClearText.transform.DOScale(0.5f, 0.3f);
-        }
+        GameClearText.SetActive(true);
+        GameClearText.transform.DOScale(0.5f, 0.3f);
         yield return new WaitForSeconds(1.0f);
         CameraFade.Fade(Color.white, 2.0f);
         yield return new WaitForSeconds(3.0f);
