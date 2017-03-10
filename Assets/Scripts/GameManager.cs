@@ -44,8 +44,17 @@ public class GameManager : MonoBehaviour {
     public GameObject GameOverText;
     public GameObject GameClearText;
 
+    private bool isPause;
+    public VRTK_ControllerEvents RightControllerEvents;
+    public VRTK_ControllerEvents LeftControllerEvents;
+    public GameObject LeftModel;
+    public GameObject RightModel;
+    public GameObject LeftControllerModel;
+    public GameObject RightControllerModel;
+    public GameObject MenuCanvasPrefab;
 
-
+    private bool isLeftHand;
+    private GameObject MenuCanvas;
 
     void Awake()
     {
@@ -56,56 +65,109 @@ public class GameManager : MonoBehaviour {
     {
         GameOverText.SetActive(false);
         GameClearText.SetActive(false);
+        isPause = false;
+        RightControllerEvents.ButtonOnePressed += RightControllerEvents_ButtonOnePressed;
+        LeftControllerEvents.ButtonOnePressed += LeftControllerEvents_ButtonOnePressed;
         InitPuzzle(QuestionCount);
     }
 
+    private void LeftControllerEvents_ButtonOnePressed(object sender, ControllerInteractionEventArgs e)
+    {
+        isPause = !isPause;
+        isLeftHand = true;
+    }
+
+    private void RightControllerEvents_ButtonOnePressed(object sender, ControllerInteractionEventArgs e)
+    {
+        isPause = !isPause;
+        isLeftHand = false;
+    }
 
     void Update()
     {
-        if(GameInfo.Instance.isGameOver|| GameInfo.Instance.Minute >= 60)
+        if (isPause)
         {
-            GameInfo.Instance.isGameOver = false;
-            StartCoroutine(GameOver());
-        }
-        if (StageNumber != 0)
-        {
-            GameInfo.Instance.isTimeCount = true;
-        }
-        else
-        {
-            GameInfo.Instance.isTimeCount = false;
-        }
-
-        TimeText.text = GameInfo.Instance.Minute + "：" + (int)GameInfo.Instance.Second;
-
-        if (StageNumber != 0)
-        {
-            if (GameInfo.Instance.HP < 0)
+            LeftControllerModel.SetActive(true);
+            RightControllerModel.SetActive(true);
+            LeftModel.SetActive(false);
+            RightModel.SetActive(false);
+            if (isLeftHand)
             {
-                HPText.text = "0";
+                if (null == MenuCanvas)
+                {
+                    MenuCanvas = Instantiate(MenuCanvasPrefab, LeftControllerModel.transform.parent) as GameObject;
+                    MenuCanvas.transform.localPosition = new Vector3(0, 0, 0.15f);
+                    MenuCanvas.transform.localRotation = Quaternion.identity;
+                    MenuCanvas.transform.localScale = new Vector3(0.003f, 0.003f, 0.003f);
+                }
             }
             else
             {
-                HPText.text = GameInfo.Instance.HP.ToString();
-            }        
+                if (null == MenuCanvas)
+                {
+                    MenuCanvas = Instantiate(MenuCanvasPrefab, RightControllerModel.transform.parent) as GameObject;
+                    MenuCanvas.transform.localPosition = new Vector3(0, 0, 0.15f);
+                    MenuCanvas.transform.localRotation = Quaternion.identity;
+                    MenuCanvas.transform.localScale = new Vector3(0.003f, 0.003f, 0.003f);
+                }
+            }
+            Time.timeScale = 0;
+            return;
         }
         else
         {
-            HPText.text = "∞";
-        }
+            LeftControllerModel.SetActive(false);
+            RightControllerModel.SetActive(false);
+            LeftModel.SetActive(true);
+            RightModel.SetActive(true);
+            if (MenuCanvas != null)
+                Destroy(MenuCanvas);
+            Time.timeScale = 1;
 
-        if (GameInfo.Instance.HP <= 5 && Audio.clip != BGM_Clips[1])
-        {    
-            Audio.clip = BGM_Clips[1];
-            Audio.Play();
-        }
+            if (GameInfo.Instance.isGameOver || GameInfo.Instance.Minute >= 60)
+            {
+                GameInfo.Instance.isGameOver = false;
+                StartCoroutine(GameOver());
+            }
+            if (StageNumber != 0)
+            {
+                GameInfo.Instance.isTimeCount = true;
+            }
+            else
+            {
+                GameInfo.Instance.isTimeCount = false;
+            }
 
-        if (QuestionCount == 0)
-        {
-            QuestionCount = 1;
-            StartCoroutine(StageClear(StageNumber));
-        }
+            TimeText.text = GameInfo.Instance.Minute + "：" + (int)GameInfo.Instance.Second;
 
+            if (StageNumber != 0)
+            {
+                if (GameInfo.Instance.HP < 0)
+                {
+                    HPText.text = "0";
+                }
+                else
+                {
+                    HPText.text = GameInfo.Instance.HP.ToString();
+                }
+            }
+            else
+            {
+                HPText.text = "∞";
+            }
+
+            if (GameInfo.Instance.HP <= 5 && Audio.clip != BGM_Clips[1])
+            {
+                Audio.clip = BGM_Clips[1];
+                Audio.Play();
+            }
+
+            if (QuestionCount == 0)
+            {
+                QuestionCount = 1;
+                StartCoroutine(StageClear(StageNumber));
+            }
+        }
     }
 
     private void InitPuzzle(int count)
