@@ -14,7 +14,7 @@ public class ClearStage : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
         GameInfo.Instance.isTimeCount = false;
-        TimeText.text = GameInfo.Instance.Minute + "：" + (int)GameInfo.Instance.Second;
+	    TimeText.text = GameInfo.Instance.Minute.ToString().PadLeft(2, '0') + "：" + GameInfo.Instance.Second.ToString("00");
         TimeText.transform.parent.gameObject.SetActive(false);
         StartCoroutine(ShowClear());
     }

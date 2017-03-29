@@ -33,7 +33,7 @@ public class GameInfo : MonoBehaviour {
         if (isTimeCount)
         {
             Second += Time.deltaTime;
-            if (Second >= 60)
+            if (Second > 59)
             {
                 Second = 0;
                 Minute += 1;

@@ -54,8 +54,12 @@ public class GameManager : MonoBehaviour {
     public GameObject MenuCanvasPrefab;
 
     private bool isLeftHand;
-    private GameObject MenuCanvas;
-
+    //缓存
+    private GameObject _menuCanvas;
+    private VRTK_SimplePointer _leftSimplePointer;
+    private VRTK_UIPointer _leftUIPointer;
+    private VRTK_SimplePointer _rightSimplePointer;
+    private VRTK_UIPointer _rightUIPointer;
     void Awake()
     {
         Instance = this;
@@ -63,20 +67,41 @@ public class GameManager : MonoBehaviour {
     // Use this for initialization
     void Start ()
     {
+        //初始化
         GameOverText.SetActive(false);
         GameClearText.SetActive(false);
         isPause = false;
+        //绑定手柄按键事件
         RightControllerEvents.ButtonOnePressed += RightControllerEvents_ButtonOnePressed;
         LeftControllerEvents.ButtonOnePressed += LeftControllerEvents_ButtonOnePressed;
+
+        _leftSimplePointer = LeftControllerEvents.GetComponent<VRTK_SimplePointer>();
+        _leftUIPointer = LeftControllerEvents.GetComponent<VRTK_UIPointer>();
+        _rightSimplePointer = RightControllerEvents.GetComponent<VRTK_SimplePointer>();
+        _rightUIPointer = RightControllerEvents.GetComponent<VRTK_UIPointer>();
+
+        _leftSimplePointer.enabled = false;
+        _leftUIPointer.enabled = false;
+        _rightSimplePointer.enabled = false;
+        _rightUIPointer.enabled = false;
+        //初始化拼图
         InitPuzzle(QuestionCount);
     }
-
+    /// <summary>
+    /// 左手柄暂停按键回掉函数
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
     private void LeftControllerEvents_ButtonOnePressed(object sender, ControllerInteractionEventArgs e)
     {
         isPause = !isPause;
         isLeftHand = true;
     }
-
+    /// <summary>
+    /// 右手柄暂停按键回掉函数
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
     private void RightControllerEvents_ButtonOnePressed(object sender, ControllerInteractionEventArgs e)
     {
         isPause = !isPause;
@@ -85,6 +110,7 @@ public class GameManager : MonoBehaviour {
 
     void Update()
     {
+        //暂停情况的处理
         if (isPause)
         {
             LeftControllerModel.SetActive(true);
@@ -93,35 +119,47 @@ public class GameManager : MonoBehaviour {
             RightModel.SetActive(false);
             if (isLeftHand)
             {
-                if (null == MenuCanvas)
+                if (null == _menuCanvas)
                 {
-                    MenuCanvas = Instantiate(MenuCanvasPrefab, LeftControllerModel.transform.parent) as GameObject;
-                    MenuCanvas.transform.localPosition = new Vector3(0, 0, 0.15f);
-                    MenuCanvas.transform.localRotation = Quaternion.identity;
-                    MenuCanvas.transform.localScale = new Vector3(0.003f, 0.003f, 0.003f);
+                    //显示UI
+                    _menuCanvas = Instantiate(MenuCanvasPrefab, LeftControllerModel.transform.parent) as GameObject;
+                    //给另一只手柄添加UI交互
+                    _rightSimplePointer.enabled = true;
+                    _rightUIPointer.enabled = true;
+                    _menuCanvas.transform.localPosition = MenuCanvasPrefab.transform.position;
+                    _menuCanvas.transform.localRotation = MenuCanvasPrefab.transform.rotation;
+                    _menuCanvas.transform.localScale = MenuCanvasPrefab.transform.localScale;
                 }
             }
             else
             {
-                if (null == MenuCanvas)
+                if (null == _menuCanvas)
                 {
-                    MenuCanvas = Instantiate(MenuCanvasPrefab, RightControllerModel.transform.parent) as GameObject;
-                    MenuCanvas.transform.localPosition = new Vector3(0, 0, 0.15f);
-                    MenuCanvas.transform.localRotation = Quaternion.identity;
-                    MenuCanvas.transform.localScale = new Vector3(0.003f, 0.003f, 0.003f);
+                    //显示UI
+                    _menuCanvas = Instantiate(MenuCanvasPrefab, RightControllerModel.transform.parent) as GameObject;
+                    //给另一只手柄添加UI交互
+                    _leftSimplePointer.enabled = true;
+                    _leftUIPointer.enabled = true;
+                    _menuCanvas.transform.localPosition = MenuCanvasPrefab.transform.position;
+                    _menuCanvas.transform.localRotation = MenuCanvasPrefab.transform.rotation;
+                    _menuCanvas.transform.localScale = MenuCanvasPrefab.transform.localScale;
                 }
             }
             Time.timeScale = 0;
             return;
         }
-        else
-        {
+
+            //非暂停情况的处理
             LeftControllerModel.SetActive(false);
             RightControllerModel.SetActive(false);
+            _leftSimplePointer.enabled = false;
+            _leftUIPointer.enabled = false;
+            _rightSimplePointer.enabled = false;
+            _rightUIPointer.enabled = false;
             LeftModel.SetActive(true);
             RightModel.SetActive(true);
-            if (MenuCanvas != null)
-                Destroy(MenuCanvas);
+            if (_menuCanvas != null)
+                Destroy(_menuCanvas);
             Time.timeScale = 1;
 
             if (GameInfo.Instance.isGameOver || GameInfo.Instance.Minute >= 60)
@@ -138,7 +176,8 @@ public class GameManager : MonoBehaviour {
                 GameInfo.Instance.isTimeCount = false;
             }
 
-            TimeText.text = GameInfo.Instance.Minute + "：" + (int)GameInfo.Instance.Second;
+            TimeText.text = GameInfo.Instance.Minute.ToString().PadLeft(2, '0') + "：" +
+                            GameInfo.Instance.Second.ToString("00");
 
             if (StageNumber != 0)
             {
@@ -167,9 +206,12 @@ public class GameManager : MonoBehaviour {
                 QuestionCount = 1;
                 StartCoroutine(StageClear(StageNumber));
             }
-        }
     }
 
+    /// <summary>
+    /// 初始化拼图
+    /// </summary>
+    /// <param name="count"></param>
     private void InitPuzzle(int count)
     {
         for (int i = 0; i < PuzzlePositons.Length; i++)
@@ -218,6 +260,11 @@ public class GameManager : MonoBehaviour {
         }
     }
 
+    /// <summary>
+    /// 创建碰撞特效
+    /// </summary>
+    /// <param name="index"></param>
+    /// <param name="pos"></param>
     public void CreateHitEffect(int index ,Vector3 pos)
     {
         GameObject go = Instantiate(HitEffect[index]);
@@ -225,15 +272,23 @@ public class GameManager : MonoBehaviour {
         go.AddComponent<HitEffect>();
     }
 
+    /// <summary>
+    /// 打错时惩罚处理
+    /// </summary>
     public void Penalty()
     {
         CameraRig.DOShakePosition(1.0f);
         Audio.PlayOneShot(SE_Clips[0]);
-        if (GameManager.Instance.StageNumber != 1)
+        if (StageNumber != 1)
         {
             GameInfo.Instance.HP -= 1;
         }
     }
+    /// <summary>
+    /// 通关的处理
+    /// </summary>
+    /// <param name="StageNumber"></param>
+    /// <returns></returns>
     IEnumerator StageClear(int StageNumber)
     {
         yield return new WaitForSeconds(8.0f);
@@ -248,6 +303,10 @@ public class GameManager : MonoBehaviour {
         SceneManager.LoadSceneAsync(StageNumber+2);
     }
 
+    /// <summary>
+    /// 游戏结束的处理
+    /// </summary>
+    /// <returns></returns>
     IEnumerator GameOver()
     {
         Destroy(Qustions);
@@ -281,5 +340,7 @@ public class GameManager : MonoBehaviour {
         yield return new WaitForSeconds(2.0f);
         SceneManager.LoadSceneAsync(0);
     }
+
+
 
 }
