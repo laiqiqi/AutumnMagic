@@ -72,8 +72,8 @@ public class GameManager : MonoBehaviour {
         GameClearText.SetActive(false);
         isPause = false;
         //绑定手柄按键事件
-        RightControllerEvents.ButtonOnePressed += RightControllerEvents_ButtonOnePressed;
-        LeftControllerEvents.ButtonOnePressed += LeftControllerEvents_ButtonOnePressed;
+        //RightControllerEvents.ButtonOnePressed += RightControllerEvents_ButtonOnePressed;
+        //LeftControllerEvents.ButtonOnePressed += LeftControllerEvents_ButtonOnePressed;
 
         _leftSimplePointer = LeftControllerEvents.GetComponent<VRTK_SimplePointer>();
         _leftUIPointer = LeftControllerEvents.GetComponent<VRTK_UIPointer>();
