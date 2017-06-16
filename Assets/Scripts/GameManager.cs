@@ -251,8 +251,8 @@ public class GameManager : MonoBehaviour {
                     }
                 }
                 Puzzles[index].AddComponent<Rigidbody>().Sleep();
-                Puzzles[index].AddComponent<VRTK_InteractableObject>().isGrabbable = true;
-                Puzzles[index].AddComponent<VRTK_FixedJointGrabAttach>().throwMultiplier = 4;
+                //Puzzles[index].AddComponent<VRTK_InteractableObject>().isGrabbable = true;
+                //Puzzles[index].AddComponent<VRTK_FixedJointGrabAttach>().throwMultiplier = 4;
                 Puzzles[index].tag = "Peace";
                 Puzzles[index].AddComponent<Peace>().Index = i;
                 Puzzles.RemoveAt(index);
@@ -279,7 +279,7 @@ public class GameManager : MonoBehaviour {
     {
         CameraRig.DOShakePosition(1.0f);
         Audio.PlayOneShot(SE_Clips[0]);
-        if (StageNumber != 1)
+        if (StageNumber != 0)
         {
             GameInfo.Instance.HP -= 1;
         }

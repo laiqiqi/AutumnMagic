@@ -38,6 +38,7 @@ public class HitCheck : MonoBehaviour {
             }
             else
             {
+
                 gm.Audio.PlayOneShot(gm.SE_Clips[5]);
                 gm.CreateHitEffect(0, other.transform.position);
                 other.GetComponent<Rigidbody>().velocity = Vector3.zero;

@@ -1,43 +1,22 @@
-﻿using UnityEngine;
-using System.Collections;
+﻿using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
 using VRTK;
-using DG.Tweening;
-public class Puzzle : MonoBehaviour
+public class Puzzle : VRTK_InteractableObject
 {
-    public int PuzzleNumber;
+    private VRTK_ControllerActions controllerActions;
 
-    private VRTK_InteractableObject interactableObjectScript;
-
-    public void OnCollisionEnter(Collision collision)
+    public override void Grabbed(GameObject grabbingObject)
     {
-        if(collision.gameObject.tag == "Terrain")
-        {
-            transform.position = new Vector3(90, 16, 120);
-        }
-        if(collision.gameObject.name == "Sphere")
-        {
-            Destroy(collision.gameObject);
-            //GameManager.Instance.StageClear();
-        }
+        base.Grabbed(grabbingObject);
+        controllerActions = grabbingObject.GetComponent<VRTK_ControllerActions>();
+        controllerActions.TriggerHapticPulse(3000.0f, 0.1f, 0.05f);
+        GameManager.Instance.Audio.PlayOneShot(GameManager.Instance.SE_Clips[7]);
     }
-
-    void Update()
+    public override void Ungrabbed(GameObject previousGrabbingObject)
     {
-        if(interactableObjectScript == null)
-        {
-            interactableObjectScript = GetComponent<VRTK_InteractableObject>();
-        }
-        else
-        {
-            if (interactableObjectScript.IsGrabbed())
-            {
-                transform.DOScale(Vector3.one * 0.5f, 0.3f);
-            }
-            else
-            {
-                transform.DOScale(Vector3.one, 0.3f);
-            }
-        }
-
+        base.Ungrabbed(previousGrabbingObject);
+        controllerActions.TriggerHapticPulse(3000.0f,0.1f, 0.01f);
+        GameManager.Instance.Audio.PlayOneShot(GameManager.Instance.SE_Clips[6]);
     }
 }
